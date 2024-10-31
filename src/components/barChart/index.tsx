@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import moment from "moment-timezone";
-import { Box, Button } from "@mui/material";
+import { Box, Button, ButtonGroup } from "@mui/material";
 
 type WidgetProps = {
   data: WidgetData[] | null;
@@ -11,7 +11,7 @@ type WidgetProps = {
 };
 
 export default function EquipmentDetailsWidgetChart({ data, isPerHourUsage }: WidgetProps) {
-  const [filterMonths, setFilterMonths] = useState(1); // Define o filtro inicial para 1 mês
+  const [filterDays, setFilterDays] = useState(null);
 
   const variableData = useMemo(() => {
     return data?.find((item) => item)?.result || [];
@@ -24,7 +24,7 @@ export default function EquipmentDetailsWidgetChart({ data, isPerHourUsage }: Wi
     const timeMoment = moment(item?.time).tz("America/Sao_Paulo").format("YYYY-MM-DD HH:mm:ss");
     return {
       value: item.value,
-      time: new Date(timeMoment).getTime(), // Convertido para timestamp
+      time: new Date(timeMoment).getTime(),
     };
   });
 
@@ -32,12 +32,14 @@ export default function EquipmentDetailsWidgetChart({ data, isPerHourUsage }: Wi
     const timeMoment = moment(item?.time).format("YYYY-MM-DD HH:mm:ss");
     return {
       value: item.value,
-      time: new Date(timeMoment).getTime(), // Convertido para timestamp
+      time: new Date(timeMoment).getTime(),
     };
   });
 
   // Calcula os limites do eixo X com base no filtro
-  const minDate = moment().subtract(filterMonths, "months").startOf("day").valueOf();
+  const minDate = filterDays
+    ? moment().subtract(filterDays, "days").startOf("day").valueOf()
+    : Math.min(...[...mockDataPerHourUsage, ...mockDataDailyConsumption].map((item) => item.time)); // Mostra desde o primeiro registro disponível quando "TODO O PERÍODO"
   const maxDate = moment().endOf("day").valueOf();
 
   const options = {
@@ -58,33 +60,34 @@ export default function EquipmentDetailsWidgetChart({ data, isPerHourUsage }: Wi
       },
     },
     xaxis: {
-      type: "datetime", // Necessário para reconhecer as datas corretamente
+      type: "datetime",
       labels: {
         datetimeUTC: false,
         style: {
           fontSize: "12px",
         },
+        min: minDate,
+        max: maxDate,
       },
-      // min: minDate, // Define o limite mínimo para um mês atrás
-      // max: maxDate,
+      min: minDate,
+      max: maxDate,
     },
     tooltip: {
       x: {
-        format: "dd/MM/yyyy HH:mm", // Formatação para a tooltip
+        format: "dd/MM/yyyy HH:mm",
       },
       y: {
-        formatter: (value: number) => `${value}`, // Formatação para os valores
+        formatter: (value: number) => `${value}`,
       },
     },
     yaxis: {
       title: {
-        text: "Usage",
+        text: "Consumo Horário (m³)",
       },
-      min: -1,
     },
     dataLabels: {
       enabled: false,
-      formatter: (value) => (value !== null ? value.toFixed(2) : "0"), // Força exibição do zero
+      formatter: (value) => (value !== null ? value.toFixed(2) : "0"),
       offsetY: -10,
     },
     grid: {
@@ -94,31 +97,39 @@ export default function EquipmentDetailsWidgetChart({ data, isPerHourUsage }: Wi
 
   const series = [
     {
-      name: isPerHourUsage ? "perhourusage" : "daily_consumption",
+      name: isPerHourUsage ? "Consumo horário" : "Consumo horário",
       data: isPerHourUsage
         ? mockDataPerHourUsage.map((item) => ({ x: item.time, y: item.value / 100 }))
-        : mockDataDailyConsumption.map((item) => ({ x: item.time, y: item.value / 100 })), // Formato para datetime no eixo X
+        : mockDataDailyConsumption.map((item) => ({ x: item.time, y: item.value / 100 })),
     },
   ];
 
-  // Função para alterar o filtro de meses
-  const handleFilterChange = (months) => {
-    setFilterMonths(months);
+  // Função para alterar o filtro de dias
+  const handleFilterChange = (days) => {
+    setFilterDays(days);
   };
 
   return (
     <Box width="100%" height="400px">
-      {/* <Box display="flex" justifyContent="center" mb={2}>
-        <Button variant="contained" onClick={() => handleFilterChange(1)}>
-          Último Mês
-        </Button>
-        <Button variant="contained" onClick={() => handleFilterChange(3)} style={{ marginLeft: "10px" }}>
-          Últimos 3 Meses
-        </Button>
-        <Button variant="contained" onClick={() => handleFilterChange(6)} style={{ marginLeft: "10px" }}>
-          Últimos 6 Meses
-        </Button>
-      </Box> */}
+      <Box display="flex" justifyContent="center" mb={1} mt={1}>
+        <ButtonGroup variant="outlined" color="primary">
+          <Button onClick={() => handleFilterChange(null)} size="small" sx={{ padding: "4px 8px", fontSize: "0.8rem" }}>
+            TODO O PERÍODO
+          </Button>
+          <Button onClick={() => handleFilterChange(365)} size="small" sx={{ padding: "4px 8px", fontSize: "0.8rem" }}>
+            1 ANO
+          </Button>
+          <Button onClick={() => handleFilterChange(180)} size="small" sx={{ padding: "4px 8px", fontSize: "0.8rem" }}>
+            6 MESES
+          </Button>
+          <Button onClick={() => handleFilterChange(30)} size="small" sx={{ padding: "4px 8px", fontSize: "0.8rem" }}>
+            1 MÊS
+          </Button>
+          <Button onClick={() => handleFilterChange(15)} size="small" sx={{ padding: "4px 8px", fontSize: "0.8rem" }}>
+            15 DIAS
+          </Button>
+        </ButtonGroup>
+      </Box>
 
       <Chart options={options} series={series} type="bar" height="350" />
     </Box>
