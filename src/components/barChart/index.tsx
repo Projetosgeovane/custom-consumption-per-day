@@ -11,7 +11,7 @@ type WidgetProps = {
 };
 
 export default function EquipmentDetailsWidgetChart({ data, isPerHourUsage }: WidgetProps) {
-  const [filterDays, setFilterDays] = useState(null);
+  const [filterDays, setFilterDays] = useState(15);
 
   const variableData = useMemo(() => {
     return data?.find((item) => item)?.result || [];

@@ -6,7 +6,7 @@
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html --public-url /Profile-ID-Here/storage/Custom-widget-folder-here",
+    "build": "parcel build src/index.html --public-url /64467b722a41200008583d15/storage/custom-hour-consumption",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint src/",
