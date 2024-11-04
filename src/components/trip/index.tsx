@@ -24,14 +24,23 @@ export default function SavingsTip() {
   return (
     <Box
       sx={{
-        padding: "16px",
+        padding: "20px",
         backgroundColor: "#e0f7fa",
         borderRadius: "8px",
         textAlign: "center",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
         margin: "16px 0",
+        maxWidth: "600px", // Limita a largura do box
+        marginLeft: "auto",
+        marginRight: "auto", // Centraliza horizontalmente na página
       }}
     >
-      <Typography variant="h6">Dica de Economia</Typography>
+      <Typography variant="h6" gutterBottom>
+        Dica de Economia
+      </Typography>
       <Typography variant="body1" color="textSecondary">
         {tips[currentTip]}
       </Typography>

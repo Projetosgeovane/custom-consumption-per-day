@@ -112,7 +112,7 @@ export default function EquipmentDetailsWidgetChart({ data, isPerHourUsage }: Wi
   return (
     <Box width="100%" height="400px">
       <Box display="flex" justifyContent="center" mb={1} mt={1}>
-        <ButtonGroup variant="outlined" color="primary">
+        <ButtonGroup variant="outlined" color="primary" sx={{ width: 150 }}>
           <Button onClick={() => handleFilterChange(null)} size="small" sx={{ padding: "4px 8px", fontSize: "0.8rem" }}>
             TODO O PERÍODO
           </Button>
